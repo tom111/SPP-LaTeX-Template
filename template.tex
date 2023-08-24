@@ -1,0 +1,458 @@
+\documentclass[a4paper,11pt]{amsart}
+\pdfoutput=1 % enforce pdf
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% DFG recommends Arial.  If you want to follow this, use Helvetica
+% \usepackage{helvet}
+% \renewcommand{\familydefault}{\sfdefault}
+
+\usepackage[
+  text={445pt,575pt},
+  headheight=9pt,
+  centering
+]{geometry}
+
+\usepackage{microtype}
+\usepackage{amsfonts,amssymb}
+\usepackage{amsthm,amsmath,amsfonts}
+\usepackage{textcomp}
+\usepackage[official]{eurosym}
+\usepackage{xspace}
+
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{bbm}
+\usepackage{enumitem}
+\usepackage{color}
+\usepackage[english]{babel}
+\usepackage{url}
+
+\usepackage{nicematrix}
+\NiceMatrixOptions{
+  code-for-first-row = \scriptstyle,
+  code-for-last-col  = \scriptstyle
+}
+
+
+%%%% BEGIN BIBLATEX %%%%%
+\usepackage{csquotes}  % Needed for biblatex
+% Bibliography
+\usepackage[
+citestyle=numeric-comp, % Numerische keys, komprimiert falls möglich
+defernumbers=true, % Nützlich damit die Nummerierung Konsekutiv über alle Bibliographien ist.
+giveninits=true,  % Alle Vornamen automatisch abkürzen
+maxnames=5,  % danach mit "et al." abkürzen
+doi=false,
+url=false,
+isbn=false,
+sorting=nty  % Sorting by Name, Title, Year
+]{biblatex}
+\addbibresource{alle.bib}
+\renewcommand{\bibfont}{\small}  %% Slightly smaller font in bibliography
+% No "in" before journal names
+\renewbibmacro{in:}{}
+% Remove strange things from bibtex entries
+\AtEveryBibitem{% Clean up the bibtex rather than editing it
+ \clearlist{address}
+ \clearfield{date}
+ \clearfield{eprint}
+% \clearfield{isbn}
+% \clearfield{issn}
+ \clearlist{location}
+ \clearfield{month}
+% \clearfield{series}
+ \clearlist{language}
+ \clearname{editor}
+% \clearfield{pages}
+ \clearfield{number}
+ \clearfield{volume}
+
+ \ifentrytype{book}{}{% Remove publisher and editor except for books
+  \clearlist{publisher}
+ }
+}
+
+% If there is a DOI, don't print a URL.
+% We use source mappings for this
+% Modified from here: https://tex.stackexchange.com/questions/154864/biblatex-use-doi-only-if-there-is-no-url
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map{
+      \step[fieldsource=doi,final]
+      \step[fieldset=url,null]
+    }
+  }
+}
+
+% Make the title a clickable link to the DOI, URL, or ISBN.
+\newbibmacro{string+doiurlisbn}[1]{%
+  \iffieldundef{doi}{%
+    \iffieldundef{url}{%
+      \iffieldundef{isbn}{%
+        \iffieldundef{issn}{%
+          #1%
+        }{%
+          \href{http://books.google.com/books?vid=ISSN\thefield{issn}}{#1}%
+        }%
+      }{%
+        \href{http://books.google.com/books?vid=ISBN\thefield{isbn}}{#1}%
+      }%
+    }{%
+      \href{\thefield{url}}{#1}%
+    }%
+  }{%
+    \href{http://dx.doi.org/\thefield{doi}}{#1}%
+  }%
+}
+
+% Italic titles plain
+% \DeclareFieldFormat
+%   [article,inbook,incollection,inproceedings,patent,thesis,unpublished]
+%   {title}{\textit{#1}\isdot}
+% Titles in italic (clickable)
+\DeclareFieldFormat{title}{\usebibmacro{string+doiurlisbn}{\mkbibemph{#1}}}
+\DeclareFieldFormat[article,incollection,inproceedings,thesis,phdthesis]{title}%
+{\usebibmacro{string+doiurlisbn}{#1}}
+
+\renewbibmacro*{volume+number+eid}{%
+  \bfseries
+  \printfield{volume}%
+  \mdseries
+%  \setunit*{\adddot}% DELETED
+  \setunit*{\addnbspace}% NEW (optional); there's also \addnbthinspace
+  \printfield{number}%
+  \setunit{\addcomma\space}%
+  \printfield{eid}}
+\DeclareFieldFormat[article]{number}{\mkbibparens{#1}}
+
+% Space between references in bibliography;
+\newcommand{\myrefsep}{.2ex}
+\setlength\bibitemsep{\myrefsep}
+\setlength\bibnamesep{\myrefsep}
+\setlength\bibinitsep{\myrefsep}
+
+%% Kein "und" vor der letzten Autor*in
+\renewcommand{\finalnamedelim}{\addcomma\space}
+
+%% Punkte an den Antragstellern erscheinen wenn der bib Eintrag das Keyword "vorarbeit" enthaelt.
+%% Kombiniere: https://tex.stackexchange.com/questions/123392/add-a-marker-to-the-left-of-the-text
+\newcommand{\impmark}{\strut\vadjust{\domark}}
+
+\newcommand\vordot{$\bullet$}  %% This is the symbol used to highlight the 10 specific publications.
+
+\newcommand{\domark}{%
+  \vbox to 0pt{
+    \kern-\dp\strutbox
+    \smash{\llap{\vordot\kern15pt}}
+    \vss
+  }%
+}
+
+% mit dem \begentry Hook, bedingt auf das keyword vorarbeit.
+\renewbibmacro*{begentry}{%
+  \ifkeyword{vorarbeit}%
+  {\impmark}%
+  {}%
+}
+
+%%%%% END BIBLATEX %%%%%
+
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\definecolor{darkred}{RGB}{160,0,0}
+\definecolor{darkblue}{RGB}{0,0,160}
+\definecolor{darkgreen}{RGB}{0,100,0}
+\hypersetup{
+  colorlinks,
+  %citecolor=darkred,
+  citecolor=darkblue,
+  filecolor=black,
+  linkcolor=darkblue,
+  urlcolor=darkblue
+}
+
+% No italics, consecutive numbering per section.
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{theoremAlph}{Theorem}
+\renewcommand*{\thetheoremAlph}{\Alph{theoremAlph}}
+\newtheorem*{theorem*}{Theorem}
+%\newtheorem*{mainthm}{Main theorem}
+\newtheorem{mainthm}[theorem]{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem*{fact*}{Fact}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{challenge}[theorem]{Challenge}
+\newtheorem{qu}[theorem]{Question}
+
+% := und =:
+\newcommand\defas{\coloneqq}
+\newcommand\asdef{\eqqcolon}
+
+% \newcommand\set[1]{\left\{\,#1\,\right\}}  % Thin spaces are recommended by D. Knuth.
+\newcommand\set[1]{\left\{#1\right\}}
+
+\newcommand{\A}{\mathcal{A}}
+\newcommand{\C}[1]{\mathcal{#1}}
+\newcommand{\cD}{\C{D}}
+\newcommand{\B}[1]{\mathbb{#1}}
+\newcommand{\F}[1]{\mathfrak{#1}}
+\newcommand{\T}[1]{\mathtt{#1}}
+\newcommand{\R}[1]{\mathrm{#1}}
+
+\newcommand{\NN}{\B N}
+\newcommand{\ZZ}{\B Z}
+\newcommand{\QQ}{\B Q}
+\newcommand{\RR}{\B R}
+\newcommand{\CC}{\B C}
+\renewcommand{\SS}{\B S} % shadows the "capital ß" macro
+\newcommand{\M}{\C M}
+
+\newcommand{\PSD}{\mathrm{PSD}}
+\newcommand{\PD}{\mathrm{PD}}
+\newcommand{\GL}{\mathrm{GL}}
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\newcommand{\<}{\langle}
+\renewcommand{\>}{\rangle}
+% Double \langle, \rangle from https://tex.stackexchange.com/questions/79657/how-to-get-double-angle-bracket-without-using-mnsymbol-package
+\makeatletter
+\newsavebox{\@brx}
+\newcommand{\llangle}[1][]{\savebox{\@brx}{\(\m@th{#1\langle}\)}%
+  \mathopen{\copy\@brx\mkern2mu\kern-0.9\wd\@brx\usebox{\@brx}}}
+\newcommand{\rrangle}[1][]{\savebox{\@brx}{\(\m@th{#1\rangle}\)}%
+  \mathclose{\copy\@brx\mkern2mu\kern-0.9\wd\@brx\usebox{\@brx}}}
+\makeatother
+
+\usepackage{lipsum}
+
+\usepackage{ifthen}
+\usepackage{xparse}
+\usepackage{tikz}
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{arrows.meta}
+
+%% Official DFG Instruction from RTF file
+\newcommand{\dfg}[1]{\emph{\textcolor{darkgreen}{DFG: #1}}}
+%% TKs comments
+\newcommand{\tk}[1]{\textcolor{darkred}{#1}}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\mbox{}
+\bigskip
+
+\begin{center}{\bf\large DFG Project Proposal within SPP 2458}\end{center}
+
+\vspace{4cm}
+
+{\bf\huge
+\begin{center}
+  SPP project
+\end{center}
+}
+
+\vspace{4cm}
+
+{\bf\large
+\begin{center}
+  Prof.~X \quad Dr.~Y
+\end{center}
+}
+
+\newpage
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+\section{State of the art and preliminary work}
+\label{sec:stateOfArt}
+\dfg{Sections \ref{sec:stateOfArt}-\ref{sec:bib} must not exceed 17
+  pages in total.}
+
+\tk{The DFG calls the first section \emph{Starting point} and then has
+  another bold headline \emph{State of the art and preliminary work}
+  which we shortened here.}
+
+\bigskip
+
+\lipsum[2]
+
+\subsection{Introduction and overview}
+
+We have worked a lot on~\cite{x92:_analp_formal} but Green and Tao
+solved it eventually~\cite{green2008primes}.  \lipsum[1]
+
+\subsection{Analphabetelian Categories}
+\label{sec:one}
+
+\lipsum[3]
+
+\subsection{Beyond commutativity}
+\label{sec:two}
+
+\lipsum[4]
+
+%% More sections...
+
+\section{Objectives and work program}
+\label{sec:objAndWork}
+
+\subsection{Anticipated total duration of project}
+36 months
+
+\subsection{Objectives}
+\label{sec:objectives}
+
+\lipsum[5]
+
+\subsection{Work programme including proposed research methods}
+\dfg{For each applicant.}
+
+\lipsum[6]
+
+\subsection{Handling of research data}
+
+\lipsum[7]
+
+\subsection{Relevance of sex, gender and/or diversity}
+
+\lipsum[8]
+
+
+\section{Project- and subject-related publications}
+\label{sec:bib}
+
+\dfg{Works cited from sections 1 and 2, both by the applicant(s) and
+  by third parties. Please include DOI/URL if available. A maximum of
+  ten of your own works cited may be highlighted; font at least Arial
+  9 pt.}
+
+\tk{This DFG requirement is implemented in Biblatex: Include the
+  keyword \emph{vorarbeit} in the bib-file on a maximum of ten
+  publications to do the highlighting.}
+
+Highlighted publications by the authors of this proposal are marked
+with $\bullet$.  If a DOI is available, the title of the paper is a
+clickable link to the electronic version.
+
+\medskip
+\printbibliography[heading=none]
+
+
+\section{Supplementary information on the research context}
+\label{sec:suppl}
+\dfg{Section~\ref{sec:suppl} et seq. must not exceed 8 pages.}
+
+\subsection{Ethical and/or legal aspects of the project}
+\subsubsection{General ethical aspects}
+\subsubsection{Descriptions of proposed investigations involving humans, human materials or identifiable data}
+\subsubsection{Descriptions of proposed investigations involving experiments on animals}
+\subsubsection{Descriptions of projects involving genetic resources (or associated traditional knowledge) from a foreign country}
+\subsubsection{Explanations regarding any possible safety-related aspects (“Dual Use Research of Concern; foreign trade law)}
+
+\subsection{Employment status information}
+
+\dfg{For each applicant, state the last name, first name, and
+  employment status (including duration of contract and funding body,
+  if on a fixed-term contract).}
+
+\subsection{First-time proposal data}
+\dfg{Only if applicable: Last name, first name of first-time
+  applicant}
+
+\subsection{Composition of the project group}
+\dfg{List only those individuals who will work on the project but will
+  not be paid out of the project funds. State each person’s name,
+  academic title, employment status, and type of funding.}
+
+\subsection{Researchers in Germany with whom you have agreed to cooperate on this project}
+
+\subsection{Researchers abroad with whom you have agreed to cooperate on this project}
+\dfg{This information will help avoid potential conflicts of
+  interest.}
+
+\subsection{Project-relevant cooperation with commercial enterprises}
+\dfg{If applicable, please note the EU guidelines on state aid or
+  contact your research institution in this regard.}
+
+\subsection{Project-relevant cparticipation in commercial enterprises}
+\dfg{Information on connections between the project and the production
+  branch of the enterprise}
+
+\subsection{Scientific equipment}
+\dfg{List larger instruments that will be available to you for the
+  project. These may include large computer facilities if computing
+  capacity will be needed.}
+
+\subsection{Other submissions}
+\dfg{List any funding proposals for this project and/or major
+  instrumentation previously submitted to a third party.}
+
+\subsection{Other Information}
+\dfg{Please use this section for any additional information you feel
+  is relevant which has not been provided elsewhere.}
+
+\section{Requested funds/modules}
+\dfg{Explain each item for each applicant (stating last name, first
+  name).}
+
+\subsection{Basic module}
+
+\subsubsection{Funding for staff}
+
+\lipsum[9]
+
+\subsubsection{Direct Project Costs}
+
+\paragraph{Equipment up to \euro 10.000, Software and Consumables}
+
+\paragraph{Travel Expenses}
+
+\paragraph{Visiting Researchers (excluding Mercator Fellows)}
+
+\paragraph{Expenses for Laboratory Animals}
+
+\paragraph{Other Costs}
+
+\paragraph{Project-related Publication Expenses}
+
+
+\subsubsection{Instrumentation}
+\paragraph{Equipment exceeding \euro 10,000}
+\paragraph{Major Instrumentation exceeding \euro 50,000}
+
+\subsection{Module Temporary Position for Principal Investigator}
+\subsection{Module Replacement Funding}
+\subsection{Module Temporary Clinician Substitute}
+\subsection{Module Mercator Fellows}
+\subsection{Module Workshop Funding}
+\subsection{Module Public Relations Funding}
+\subsection{Module Standard Allowance for Gender Equality Measures}
+\dfg{Please detail what measures are planned to promote diversity and
+  equal opportunities.  If you are submitting your proposal for an
+  individual research grant within a network, note that this standard
+  allowance may only be applied for within the coordination
+  project. The coordination project must combine all such requests in
+  its calculation.}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
