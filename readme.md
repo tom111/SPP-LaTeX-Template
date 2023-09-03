@@ -7,7 +7,7 @@ Kahle](https://www.thomas-kahle.de).  It comes **with no warranty or
 responsibility whatsoever**.  When in doubt about proposal formatting
 or requirements, always consult with the DFG.
 
-- [Official Documentation](https://www.dfg.de/foerderung/programme/koordinierte_programme/schwerpunktprogramme/formulare_merkblaetter/index.jsp)
+- [Official Documentation on the DFG homepage](https://www.dfg.de/foerderung/programme/koordinierte_programme/schwerpunktprogramme/formulare_merkblaetter/index.jsp)
 
 - The DFG suggests Arial font which is unavailable in standard LaTeX.
   If you want to stay close to that suggestions, uncomment lines 8 and
