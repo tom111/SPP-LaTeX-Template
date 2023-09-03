@@ -7,9 +7,15 @@ Kahle](https://www.thomas-kahle.de).  It comes **with no warranty or
 responsibility whatsoever**.  When in doubt about proposal formatting
 or requirements, always consult with the DFG.
 
-- The DFG suggests Arial Font which is unavailable in standard LaTeX.
+- [Official Documentation](https://www.dfg.de/foerderung/programme/koordinierte_programme/schwerpunktprogramme/formulare_merkblaetter/index.jsp)
+
+- The DFG suggests Arial font which is unavailable in standard LaTeX.
   If you want to stay close to that suggestions, uncomment lines 8 and
   9 in the .tex to activate Helvetica.
+
+- The font size should be at least 11pt with 1.2 line spacing.  This
+  should be satisfied with LaTeX's 11pt setting.  For the references
+  a minimum font size of 9pt is required.
   
 - The finished proposal has a page limit of 17 pages for Sections 1-3
   and an additional 8 pages for the remaining sections.  Proposals are submitted
