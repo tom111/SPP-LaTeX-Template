@@ -11,7 +11,8 @@ or requirements, always consult with the DFG.
   If you want to stay close to that suggestions, uncomment lines 8 and
   9 in the .tex to activate Helvetica.
   
-- The finished proposal must not exceed 20 pages and is submitted
+- The finished proposal has a page limit of 17 pages for Sections 1-3
+  and an additional 8 pages for the remaining sections.  Proposals are submitted
   through [elan](https://elan.dfg.de)
 
 - There are many sections which are not relevant to all proposals.
