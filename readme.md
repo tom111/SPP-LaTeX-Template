@@ -35,6 +35,13 @@ or requirements, always consult with the DFG.
   `pdflatex template.tex` twice.  Include the keyword `vorarbeit` in
   your max. 10 publications to be highlighted in the bibliography.
 
+- Only the project description template (`53.01`) is implemented in
+  LaTeX.  A separate CV template (`53.200`) must be submitted alongside
+  the proposal; the current RTF is included here for reference.  
+  Per DFG instructions, the CV must not exceed
+  four pages, use at least Arial 11pt with 1.2 line spacing, contain
+  no photograph, and be named `CV_PubList_<lastname>`.
+
 ## License
 
 Everything here is published under the
