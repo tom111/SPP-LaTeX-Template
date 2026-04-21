@@ -44,5 +44,10 @@ or requirements, always consult with the DFG.
 
 ## License
 
-Everything here is published under the
-[GPLv3](https://www.gnu.org/licenses/gpl-3.0.html.en).
+The LaTeX template and other original content in this repository are
+published under the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.html.en).
+
+The DFG RTF templates (`53_01_en_elan_*.rtf`, `53_200_en_elan_*.rtf`)
+are **not** covered by the GPL.  They are cited here as distributed
+on the [DFG homepage](https://www.dfg.de) and are provided as-is for
+reference.
