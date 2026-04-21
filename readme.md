@@ -7,6 +7,9 @@ Kahle](https://www.thomas-kahle.de).  It comes **with no warranty or
 responsibility whatsoever**.  When in doubt about proposal formatting
 or requirements, always consult with the DFG.
 
+**Updated 2026-04-21** to match the current DFG templates
+(`53-01-en-elan` version 09/25, `53-200-en-elan` version 07/25).
+
 - [Official Documentation on the DFG homepage](https://www.dfg.de/foerderung/programme/koordinierte_programme/schwerpunktprogramme/formulare_merkblaetter/index.jsp)
 
 - The DFG suggests Arial font which is unavailable in standard LaTeX.
@@ -27,8 +30,10 @@ or requirements, always consult with the DFG.
   measures are all centrally applied for within an SPP.  Consequently
   these can be removed.  The template stays close to the original rtf.
   
-- The proposal uses biblatex.  Include the keyword `vorarbeit` in your
-  max. 10 publications to be highlighted in the bibliography.
+- The proposal uses `biblatex` with the `biber` backend (not BibTeX).
+  Build with `pdflatex template.tex`, then `biber template`, then
+  `pdflatex template.tex` twice.  Include the keyword `vorarbeit` in
+  your max. 10 publications to be highlighted in the bibliography.
 
 ## License
 
