@@ -1,10 +1,14 @@
+%% LaTeX version of the DFG template 53.01 elan, version 09/26
+%% (Project Description - Project Proposals), for proposals within the
+%% Priority Programme SPP 2458 "Combinatorial Synergies".  See readme.md.
 \documentclass[a4paper,11pt]{amsart}
 \pdfoutput=1 % enforce pdf
 
-\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
-%% DFG recommends Arial.  If you want to follow this, use Helvetica
+%% DFG: font not smaller than Arial 11pt.  Arial is not available in
+%% standard LaTeX.  For a similar look, use Helvetica (the clone
+%% tgheros instead of helvet also has small caps):
 % \usepackage{helvet}
 % \renewcommand{\familydefault}{\sfdefault}
 
@@ -14,19 +18,23 @@
   centering
 ]{geometry}
 
+%% DFG: line spacing not less than 1.2.  The 11pt option of amsart sets
+%% 10.95pt type on 13pt baselines, a ratio of 1.19.  This stretches the
+%% baselines to 13.26pt, a ratio of 1.21 (1.22 for the 10pt type of the
+%% publication list).
+\linespread{1.02}
+
 \usepackage{microtype}
-\usepackage{amsfonts,amssymb}
-\usepackage{amsthm,amsmath,amsfonts}
-\usepackage{textcomp}
-\usepackage[official]{eurosym}
+\usepackage{amssymb}
+%% Euro sign in the text font.  Unlike the euro of the eurosym package,
+%% it is copied from the PDF as a euro sign, not as the letter e.
+\newcommand{\euro}{\texteuro}
 \usepackage{xspace}
 
 \usepackage{array}
 \usepackage{graphicx}
-\usepackage{setspace}
 \usepackage{bbm}
 \usepackage{enumitem}
-\usepackage{color}
 \usepackage[british]{babel}
 \usepackage{url}
 
@@ -45,20 +53,27 @@ citestyle=numeric-comp, % Numerische keys, komprimiert falls möglich
 defernumbers=true, % Nützlich damit die Nummerierung Konsekutiv über alle Bibliographien ist.
 giveninits=true,  % Alle Vornamen automatisch abkürzen
 maxnames=5,  % danach mit "et al." abkürzen
-doi=false,
-url=false,
+doi=true,  % DFG: include DOI/URL if available
+url=true,  % only printed for entries without DOI and arXiv identifier
 isbn=false,
 sorting=nty  % Sorting by Name, Title, Year
 ]{biblatex}
 \addbibresource{alle.bib}
-\renewcommand{\bibfont}{\small}  %% Slightly smaller font in bibliography
+\renewcommand{\bibfont}{\small}  %% 10pt, the DFG requires at least 9pt
+\appto{\bibsetup}{\raggedright}  % avoid stranded URL/DOI fragments
+% Keep "DOI:" glued to the DOI itself so ragged-right can't break
+% between them
+\DeclareFieldFormat{doi}{%
+  \mkbibacro{DOI}\addcolon\nobreakspace
+  \ifhyperref
+    {\href{https://doi.org/#1}{\nolinkurl{#1}}}
+    {\nolinkurl{#1}}}
 % No "in" before journal names
 \renewbibmacro{in:}{}
 % Remove strange things from bibtex entries
 \AtEveryBibitem{% Clean up the bibtex rather than editing it
  \clearlist{address}
  \clearfield{date}
- \clearfield{eprint}
 % \clearfield{isbn}
 % \clearfield{issn}
  \clearlist{location}
@@ -75,13 +90,19 @@ sorting=nty  % Sorting by Name, Title, Year
  }
 }
 
-% If there is a DOI, don't print a URL.
-% We use source mappings for this
+% DFG: give a persistent identifier, preferably the DOI.  If there is
+% a DOI, print neither URL nor arXiv identifier.  If there is an arXiv
+% identifier (eprint), print no URL.  We use source mappings for this.
 % Modified from here: https://tex.stackexchange.com/questions/154864/biblatex-use-doi-only-if-there-is-no-url
 \DeclareSourcemap{
   \maps[datatype=bibtex]{
     \map{
       \step[fieldsource=doi,final]
+      \step[fieldset=url,null]
+      \step[fieldset=eprint,null]
+    }
+    \map{
+      \step[fieldsource=eprint,final]
       \step[fieldset=url,null]
     }
   }
@@ -95,16 +116,16 @@ sorting=nty  % Sorting by Name, Title, Year
         \iffieldundef{issn}{%
           #1%
         }{%
-          \href{http://books.google.com/books?vid=ISSN\thefield{issn}}{#1}%
+          \href{https://books.google.com/books?vid=ISSN\thefield{issn}}{#1}%
         }%
       }{%
-        \href{http://books.google.com/books?vid=ISBN\thefield{isbn}}{#1}%
+        \href{https://books.google.com/books?vid=ISBN\thefield{isbn}}{#1}%
       }%
     }{%
       \href{\thefield{url}}{#1}%
     }%
   }{%
-    \href{http://dx.doi.org/\thefield{doi}}{#1}%
+    \href{https://doi.org/\thefield{doi}}{#1}%
   }%
 }
 
@@ -152,15 +173,23 @@ sorting=nty  % Sorting by Name, Title, Year
 }
 
 % mit dem \begentry Hook, bedingt auf das keyword vorarbeit.
+% The counter checks the DFG maximum of ten highlighted publications.
+\newcounter{vorarbeit}
 \renewbibmacro*{begentry}{%
   \ifkeyword{vorarbeit}%
-  {\impmark}%
+  {\stepcounter{vorarbeit}\impmark}%
   {}%
+}
+\AtEndDocument{%
+  \ifnum\value{vorarbeit}>10
+    \PackageWarningNoLine{template}{%
+      \arabic{vorarbeit} publications carry the keyword vorarbeit.\MessageBreak
+      The DFG allows at most ten highlighted publications}%
+  \fi
 }
 
 %%%%% END BIBLATEX %%%%%
 
-\usepackage{url}
 \usepackage{hyperref}
 \usepackage{xcolor}
 \definecolor{darkred}{RGB}{160,0,0}
@@ -239,7 +268,6 @@ sorting=nty  % Sorting by Name, Title, Year
 \usepackage{lipsum}
 
 \usepackage{ifthen}
-\usepackage{xparse}
 \usepackage{tikz}
 \usetikzlibrary{backgrounds}
 \usetikzlibrary{arrows.meta}
@@ -248,47 +276,72 @@ sorting=nty  % Sorting by Name, Title, Year
 \newcommand{\dfg}[1]{\emph{\textcolor{darkgreen}{DFG: #1}}}
 %% TKs comments
 \newcommand{\tk}[1]{\textcolor{darkred}{#1}}
+%% For the final version, remove the instructions and comments:
+% \renewcommand{\dfg}[1]{}
+% \renewcommand{\tk}[1]{}
+
+%% The DFG form numbers headings down to the fourth level (4.1.4.1).
+\setcounter{secnumdepth}{4}
+
+%% Running head as in the DFG form: form version and page count
+%% against the page limit.  Sections 1-3 have at most 17 pages.
+%% Section 4 starts on a new page, and from there the count restarts
+%% against at most 8 pages (\dfgsecondpart).
+\newcommand{\dfgform}{DFG form 53.01 -- 09/26}
+\newcommand{\dfgmaxpages}{17}
+\newcounter{dfgpageoffset}
+\makeatletter
+\def\ps@dfg{\ps@empty
+  \def\@oddhead{\normalfont\scriptsize\dfgform\hfil
+    page~\the\numexpr\value{page}-\value{dfgpageoffset}\relax
+    \ of max.~\dfgmaxpages}%
+  \let\@evenhead\@oddhead}
+\makeatother
+\pagestyle{dfg}
+\newcommand{\dfgsecondpart}{%
+  \clearpage
+  \setcounter{dfgpageoffset}{\numexpr\value{page}-1\relax}%
+  \renewcommand{\dfgmaxpages}{8}}
 
 \begin{document}
+\thispagestyle{dfg}  % amsart sets the first page to plain
 
-\thispagestyle{empty}
-
-\mbox{}
-\bigskip
-
-\begin{center}{\bf\large DFG Project Proposal within SPP 2458}\end{center}
-
-\vspace{4cm}
-
-{\bf\huge
 \begin{center}
-  SPP project
+  {\large\bfseries Project Description -- Project Proposals\par}
+  within the DFG Priority Programme SPP~2458 ``Combinatorial
+  Synergies''
+
+  \bigskip
+  %% [First name last name, city of all applicants]
+  {\bfseries Prof.~X, City \quad Dr.~Y, City\par}
+
+  \bigskip
+  %% [Project title]
+  {\Large\bfseries SPP project\par}
 \end{center}
-}
 
-\vspace{4cm}
+%% A table of contents is not part of the DFG form and counts against
+%% the 17 pages.
+% \setcounter{tocdepth}{1}
+% \tableofcontents
 
-{\bf\large
-\begin{center}
-  Prof.~X \quad Dr.~Y
-\end{center}
-}
+\section*{Project Description}
 
-\newpage
+\dfg{Sections 1--3 must not exceed 17 pages in total.}
 
-\setcounter{tocdepth}{1}
-\tableofcontents
+\section{Starting Point} \label{sec:start}
 
-\section{State of the art and preliminary work}
-\label{sec:stateOfArt}
-\dfg{Sections \ref{sec:stateOfArt}-\ref{sec:bib} must not exceed 17
-  pages in total.}
-
-\tk{The DFG calls the first section \emph{Starting Point} and then has
-  another bold headline \emph{State of the art and preliminary work}
-  which we shortened here.}
-
-\bigskip
+\subsection*{State of the art and preliminary work}
+%% DFG form 54.01: For new proposals, explain briefly and precisely the
+%% state of the art in direct relation to the project, the context of
+%% your research, where you intend to make a unique, innovative
+%% contribution, and the current state of your preliminary work.  The
+%% text must be understandable without reading the cited works.  Mark
+%% clearly whether you refer to your own work or that of others.  List
+%% your own preliminary work with its publication date, and name the
+%% funding period if it was funded by the DFG.
+\tk{Renewal proposals for the second funding period of SPP~2458
+  report here on the previous work (DFG form 54.01).}
 
 \lipsum[2]
 
@@ -297,81 +350,145 @@ sorting=nty  % Sorting by Name, Title, Year
 We have worked a lot on~\cite{x92:_analp_formal} but Green and Tao
 solved it eventually~\cite{green2008primes}.  \lipsum[1]
 
-\subsection{Analphabetelian Categories}
-\label{sec:one}
+\subsection{Analphabetelian Categories} \label{sec:one}
 
 \lipsum[3]
 
-\subsection{Beyond commutativity}
-\label{sec:two}
+\subsection{Beyond commutativity} \label{sec:two}
 
 \lipsum[4]
 
 %% More sections...
 
-\section{Objectives and work programme}
-\label{sec:objAndWork}
+\section{Objectives and work programme} \label{sec:objAndWork}
 
-\subsection{Anticipated total duration of project}
+\subsection{Anticipated total duration of the project}
 36 months
+%% DFG form 54.01: State the intended duration of the project and how
+%% long DFG funds are needed.  Renewal proposals also state since when
+%% the project has been running.
 
-\subsection{Objectives}
-\label{sec:objectives}
+\subsection{Objectives} \label{sec:objectives}
+%% DFG form 54.01: Concise description of the research programme and
+%% the scientific objectives.  Indicate results that may be relevant
+%% beyond science, if any.
+%%
+%% SPP 2458 (call, DFG Information for Researchers No. 50, 16 July 2026,
+%% and DFG form 54.01, Special Instructions I): State which of the nine
+%% themes the project addresses (enumeration, Dynkin classification,
+%% commutative algebra, matroids, convexity, lattice points, statistics,
+%% non-linear optimisation, mathematical physics) and which synergies
+%% it creates.  Extremal and additive combinatorics are not central to
+%% the programme.  Describe how the project is integral to the Priority
+%% Programme in subject matter and organisation, including the
+%% cooperation with other projects of the programme (e.g. joint
+%% training of researchers in early career phases, methods used by
+%% several projects).
 
 \lipsum[5]
 
 \subsection{Work programme incl.\ proposed research methods}
-\dfg{For each applicant.}
+\dfg{For each applicant}
+%% DFG form 54.01: Detailed account of the steps planned in the funding
+%% period.  The tasks must correspond to the funds requested in
+%% Section 5.  Describe the methods: which are available, which must be
+%% developed, and what assistance is needed from outside your group.
+%%
+%% SPP 2458 call: Proposals are strongly encouraged to outline how
+%% synergies between human mathematical insight and AI-supported
+%% methods advance their scientific goals: mathematical software and
+%% databases, statistical and machine-learning techniques, AI agents
+%% and formalisation, all under the FAIR principles.
 
 \lipsum[6]
 
 \subsection{Handling of research data}
+%% DFG form 54.01: If the project uses, generates or processes data,
+%% follow the DFG checklist (www.dfg.de/research_data/checklist):
+%% characteristics and scope of the data, documentation and data
+%% quality, storage and technical archiving, legal obligations and
+%% conditions, subsequent reuse and long-term accessibility,
+%% responsibilities and resources.  Describe how the institutions
+%% involved contribute.  The checklist counts software, compilations
+%% and simulations as research data.  If the project does not use or
+%% generate data to a relevant extent, state this explicitly.
 
 \lipsum[7]
 
 \subsection{Relevance of sex, gender and/or diversity in the research project}
+%% DFG form 54.01: Where applicable, describe whether and to what
+%% extent sex, gender and/or diversity are relevant to the methods,
+%% work programme and objectives (www.dfg.de/diversity_dimensions).
 
 \lipsum[8]
 
 
-\section{Project- and subject-related list of publications}
-\label{sec:bib}
+\section{Project- and subject-related list of publications} \label{sec:bib}
 
 \dfg{Works cited from sections 1 and 2, both by the applicant(s) and
   by third parties. Please include DOI/URL if available. A maximum of
   ten of your own works cited may be highlighted; font at least Arial
   9 pt.}
+%% DFG forms 54.01 and 1.91: List only works cited in Sections 1 and 2,
+%% with full titles.  Works that are not publicly available cannot be
+%% cited, except papers accepted for publication, whose manuscript and
+%% confirmation of acceptance must be attached.  The maximum of ten
+%% highlighted works holds for all applicants together.
 
 \tk{This DFG requirement is implemented in \texttt{biblatex}: Include
   the keyword \emph{vorarbeit} in the bib-file on a maximum of ten
-  publications to do the highlighting.}
+  publications to do the highlighting.  LaTeX warns if there are more
+  than ten.}
 
 Highlighted publications by the authors of this proposal are marked
-with $\bullet$.  If a DOI is available, the title of the paper is a
+with~$\bullet$.  If a DOI is available, the title of the paper is a
 clickable link to the electronic version.
 
 \medskip
 \printbibliography[heading=none]
 
 
-\section{Supplementary information on the research context}
-\label{sec:suppl}
-\dfg{Section~\ref{sec:suppl} et seq. must not exceed 8 pages.}
+\dfgsecondpart
+\section{Supplementary information on the research context} \label{sec:suppl}
+\dfg{Section 4 et seq. must not exceed 8 pages.}
+%% DFG form 54.01: Explain each point concisely but sufficiently, in
+%% keeping with its relevance to the project.
+%% The DFG asks applicants to keep the headings and numbering of the
+%% form.  Under points that do not apply, write ``Not applicable.''
 
 \subsection{Ethical and/or legal aspects of the project}
-\subsubsection{General ethical aspects}
-\subsubsection{Descriptions of proposed investigations on humans, human materials or identifiable data}
+
+\subsubsection{General ethical aspects and obligations}
+%% DFG form 54.01: Indicate whether you anticipate risks or harm to
+%% individuals or groups, or other negative effects of your research,
+%% and how the project addresses them.  By submitting the proposal you
+%% undertake to comply with the research ethics guidelines of your
+%% discipline and to determine whether an ethics committee statement is
+%% necessary.  If it is, the research may not begin without it.
+
+\dfg{Delete as applicable}
+
+A statement by an ethics committee is required: yes / no
+
 \subsubsection{Descriptions of proposed investigations involving experiments on animals}
+
 \subsubsection{Descriptions of projects involving genetic resources (or associated traditional knowledge) from a foreign country}
+
 \subsubsection{Explanations regarding any possible safety-related aspects}
-\dfg{``Dual Use Research of Concern''; foreign trade law}
 
-\subsection{Risks in international cooperation}
+\paragraph{\texorpdfstring{``Dual Use Research of Concern''}{\textquotedblleft Dual Use Research of Concern\textquotedblright}; foreign trade law}
 
-\subsection{Considerations on aspects of ecological sustainability in the planning and implementation of the project}
+\paragraph{Risks in international cooperation}
+%% DFG form 54.01: Where applicable, assess the risk/benefit ratio of
+%% cooperation with researchers in countries where misuse of research
+%% results is to be suspected (www.dfg.de/risiken_int_kooperationen_en).
+
+\subsubsection{Considerations on aspects of ecological sustainability in the planning and implementation of the project}
+%% DFG form 54.01: A brief statement on how sustainability is taken
+%% into account in the research processes of the work programme
+%% (www.dfg.de/reflection_sustainability).
 
 \subsection{Employment status information}
-
 \dfg{For each applicant, state the last name, first name and
   employment status (including duration of contract and funding body,
   if on a fixed-term contract).}
@@ -382,14 +499,12 @@ clickable link to the electronic version.
 
 \subsection{Composition of the project group}
 \dfg{List only those individuals who will work on the project but will
-  not be paid out of the project funds. State each person’s name,
+  not be paid out of the project funds. State each person's name,
   academic title, employment status and type of funding.}
 
 \subsection{Researchers in Germany with whom you have agreed to cooperate on this project}
 
 \subsection{Researchers abroad with whom you have agreed to cooperate on this project}
-\dfg{This information will help avoid potential conflicts of
-  interest.}
 
 \subsection{Researchers with whom you have collaborated scientifically within the past three years}
 \dfg{This information will help avoid potential conflicts of interest.}
@@ -411,17 +526,22 @@ clickable link to the electronic version.
 \dfg{List any funding proposals for this project and/or major
   instrumentation previously submitted to a third party.}
 
-\subsection{Other Information}
+\subsection{Other information}
 \dfg{Please use this space for additional information you feel
   is relevant which has not been provided elsewhere.}
+
+\tk{If generative AI was used to prepare the proposal, disclose which
+  models were used, for what purpose and to what extent (DFG form
+  54.01).  Tools that do not affect the content, such as spell
+  checkers or translation tools, need not be disclosed.}
 
 \section{Requested modules}
 \dfg{Explain each item for each applicant (stating last name, first
   name).}
 
-\subsection{Basic module}
+\subsection{Basic Module}
 
-\subsubsection{Funding for staff}
+\subsubsection{Funding for Staff}
 
 \lipsum[9]
 
@@ -448,8 +568,14 @@ clickable link to the electronic version.
 \subsection{Module Replacements}
 \subsection{Module Temporary Substitutes for Clinicians}
 \subsection{Module Mercator Fellows}
+%% SPP 2458: Mercator Fellows and workshops are requested by the
+%% coordination project, not by individual projects (SPP website).
 \subsection{Module Project-Specific Workshops}
-\subsection{Module Public Relations}
+\subsection{Module Science Communication}
+%% DFG form 52.07: Up to 1,000 euros per funding year and project may be
+%% requested as a lump sum, justified by a description of the
+%% activities and their target groups.  Larger amounts need a detailed
+%% justification.
 \subsection{Module Standard Allowance for Equity and Diversity}
 \dfg{If you are submitting your project proposal within a network,
   note that this standard allowance may only be applied for within the
